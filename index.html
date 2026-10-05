@@ -1,0 +1,1428 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tool Matching File Excel Vào Thư Mục Tương Ứng</title>
+    <!-- SheetJS for Excel export -->
+    <script src="./xlsx.full.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --surface-hover: #334155;
+            --border: #334155;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --success: #10b981;
+            --success-bg: rgba(16, 185, 129, 0.12);
+            --danger: #ef4444;
+            --danger-bg: rgba(239, 68, 68, 0.12);
+            --warning: #f59e0b;
+            --warning-bg: rgba(245, 158, 11, 0.12);
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --radius-lg: 16px;
+            --radius-md: 10px;
+            --radius-sm: 6px;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 28px 24px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 28px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #fff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .badge-pro {
+            font-size: 11px;
+            font-weight: 700;
+            background: #2563eb;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* GRID WORKSPACE */
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        @media (max-width: 960px) {
+            .grid-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* CARDS */
+        .card {
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 22px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #f1f5f9;
+        }
+
+        /* STEP BOXES */
+        .step-item {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            margin-bottom: 16px;
+            transition: all 0.2s ease;
+        }
+
+        .step-item:hover {
+            border-color: #475569;
+        }
+
+        .step-item.active {
+            border-color: var(--primary);
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .step-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .step-num {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--primary);
+            letter-spacing: 0.5px;
+        }
+
+        .step-status {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+
+        .step-status.ready {
+            background: var(--success-bg);
+            color: var(--success);
+        }
+
+        .step-status.waiting {
+            background: rgba(148, 163, 184, 0.15);
+            color: var(--text-muted);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 11px 16px;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover:not(:disabled) {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        .btn-outline:hover:not(:disabled) {
+            background: var(--surface-hover);
+            border-color: #64748b;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .folder-info {
+            margin-top: 10px;
+            font-size: 12px;
+            color: var(--text-muted);
+            word-break: break-all;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .folder-info b {
+            color: #e2e8f0;
+        }
+
+        /* OPTIONS */
+        .option-group {
+            margin-top: 18px;
+            border-top: 1px solid var(--border);
+            padding-top: 14px;
+        }
+
+        .option-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #cbd5e1;
+            margin-bottom: 10px;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-muted);
+            cursor: pointer;
+            margin-bottom: 8px;
+            user-select: none;
+        }
+
+        .checkbox-label input {
+            accent-color: var(--primary);
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        /* STATS CARDS */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+        }
+
+        .stat-total::after { background: var(--primary); }
+        .stat-matched::after { background: var(--success); }
+        .stat-unmatched::after { background: var(--danger); }
+        .stat-conflict::after { background: var(--warning); }
+
+        .stat-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 26px;
+            font-weight: 800;
+            margin-top: 4px;
+            color: #fff;
+        }
+
+        /* CONTROLS BAR */
+        .controls-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+            min-width: 240px;
+        }
+
+        .search-input {
+            width: 100%;
+            background: #0f172a;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 10px 14px 10px 36px;
+            color: white;
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .search-input:focus {
+            border-color: var(--primary);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 8px;
+            background: #0f172a;
+            padding: 4px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+        }
+
+        .filter-btn {
+            background: transparent;
+            border: none;
+            padding: 6px 14px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-btn.active {
+            background: var(--surface-hover);
+            color: white;
+        }
+
+        /* TABLE */
+        .table-container {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .table-scroll {
+            max-height: 520px;
+            overflow-y: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 13px;
+        }
+
+        thead {
+            position: sticky;
+            top: 0;
+            background: #111827;
+            z-index: 2;
+        }
+
+        th {
+            padding: 12px 16px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #94a3b8;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(51, 65, 85, 0.4);
+            color: #e2e8f0;
+            vertical-align: middle;
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .code-cell {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+        }
+
+        .folder-select {
+            background: #0f172a;
+            border: 1px solid #475569;
+            color: #e2e8f0;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            width: 100%;
+            outline: none;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .folder-select:focus {
+            border-color: var(--primary);
+        }
+
+        .folder-select option, .folder-select optgroup {
+            background: #1e293b;
+            color: #f8fafc;
+        }
+
+        .folder-select-mini {
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: #94a3b8;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .folder-select-mini:hover {
+            border-color: #64748b;
+            color: #f8fafc;
+        }
+
+        .conflict-select {
+            border-color: #f59e0b;
+            background: rgba(245, 158, 11, 0.08);
+        }
+
+        .badge-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+
+        .badge-matched {
+            background: var(--success-bg);
+            color: #34d399;
+            border: 1px solid rgba(52, 211, 153, 0.3);
+        }
+
+        .badge-unmatched {
+            background: var(--danger-bg);
+            color: #f87171;
+            border: 1px solid rgba(248, 113, 113, 0.3);
+        }
+
+        .badge-conflict {
+            background: var(--warning-bg);
+            color: #fbbf24;
+            border: 1px solid rgba(251, 191, 36, 0.3);
+        }
+
+        .badge-copied {
+            background: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+            border: 1px solid rgba(96, 165, 250, 0.3);
+        }
+
+        .empty-placeholder {
+            padding: 60px 20px;
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        .empty-icon {
+            font-size: 40px;
+            margin-bottom: 12px;
+            opacity: 0.6;
+        }
+
+        /* PROGRESS MODAL OR BAR */
+        .progress-box {
+            display: none;
+            margin-top: 14px;
+            padding: 12px;
+            background: #0f172a;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+        }
+
+        .progress-bar-wrap {
+            width: 100%;
+            height: 8px;
+            background: #334155;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #3b82f6, #10b981);
+            transition: width 0.15s ease;
+        }
+
+        .log-box {
+            max-height: 120px;
+            overflow-y: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 8px;
+            padding: 6px;
+            background: #090d16;
+            border-radius: 4px;
+        }
+
+        .tip-box {
+            background: rgba(59, 130, 246, 0.08);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            font-size: 12px;
+            color: #93c5fd;
+            margin-top: 14px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="logo-area">
+            <div class="logo-icon">📊</div>
+            <div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <h1>Smart Excel Matcher Pro</h1>
+                    <span class="badge-pro">v2.0 • Offline Ready</span>
+                </div>
+                <p class="subtitle">Khớp nối tự động File Excel với Thư mục theo Họ Tên & Chuyển file + Xuất Báo Cáo</p>
+            </div>
+        </div>
+        <div>
+            <button class="btn btn-outline" onclick="window.location.reload()" style="width: auto; padding: 8px 16px;">
+                🔄 Làm mới
+            </button>
+        </div>
+    </header>
+
+    <div class="grid-layout">
+        <!-- SIDEBAR CONTROLS -->
+        <div class="sidebar">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">📁 Các Bước Xử Lý</span>
+                </div>
+
+                <!-- STEP 1: Source Folder -->
+                <div class="step-item" id="step1-box">
+                    <div class="step-head">
+                        <span class="step-num">BƯỚC 1</span>
+                        <span class="step-status waiting" id="source-status">Chưa chọn</span>
+                    </div>
+                    <button class="btn btn-outline" id="btn-select-source" onclick="selectSourceFolder()">
+                        📂 Chọn Thư Mục Chứa File Excel
+                    </button>
+                    <div class="folder-info" id="source-info">
+                        Chưa chọn folder nguồn
+                    </div>
+                </div>
+
+                <!-- STEP 2: Target Folder -->
+                <div class="step-item" id="step2-box">
+                    <div class="step-head">
+                        <span class="step-num">BƯỚC 2</span>
+                        <span class="step-status waiting" id="target-status">Chưa chọn</span>
+                    </div>
+                    <button class="btn btn-outline" id="btn-select-target" onclick="selectTargetFolder()">
+                        🎯 Chọn Thư Mục Đích (Chứa Thư Mục Con)
+                    </button>
+                    <div class="folder-info" id="target-info">
+                        Chưa chọn folder đích
+                    </div>
+                </div>
+
+                <!-- STEP 3: Action Buttons -->
+                <div class="step-item active" id="step3-box">
+                    <div class="step-head">
+                        <span class="step-num">BƯỚC 3</span>
+                        <span class="step-status ready">Thực Hiện</span>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <button class="btn btn-primary" id="btn-copy" onclick="executeFileOperation()" disabled>
+                            🚀 Chép File Vào Thư Mục Đích
+                        </button>
+                        
+                        <button class="btn btn-success" id="btn-export" onclick="exportExcelReport()" disabled>
+                            📑 Xuất File Báo Cáo Excel (.xlsx)
+                        </button>
+                    </div>
+
+                    <!-- Progress bar -->
+                    <div class="progress-box" id="progress-box">
+                        <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                            <span id="progress-text">Đang xử lý...</span>
+                            <span id="progress-pct">0%</span>
+                        </div>
+                        <div class="progress-bar-wrap">
+                            <div class="progress-bar-fill" id="progress-bar"></div>
+                        </div>
+                        <div class="log-box" id="log-box"></div>
+                    </div>
+                </div>
+
+                <!-- OPTIONS -->
+                <div class="option-group">
+                    <div class="option-title">⚙️ Tùy Chọn Sao Chép</div>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="opt-copy-mode" checked>
+                        <span>Giữ nguyên file gốc (Sao chép, không xóa)</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="opt-keep-original-name" checked>
+                        <span>Giữ nguyên tên file gốc (Bỏ tích nếu muốn đổi thành tên chuẩn: Họ và Tên.xlsx)</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="opt-fuzzy-match" checked>
+                        <span>Bật khớp mờ thông minh (Fuzzy match khi gõ sai nhẹ)</span>
+                    </label>
+                </div>
+
+                <div class="tip-box">
+                    💡 <b>Quy tắc nhận diện thông minh:</b>
+                    <ul style="padding-left: 18px; margin-top: 6px;">
+                        <li>Tự động xóa số thứ tự, ký tự phụ & dấu phân cách: <code>174a. </code>, <code>183, </code>, <code>1. </code>, <code>2. </code>, <code>03 - </code>...</li>
+                        <li>Tự động bỏ mã CCCD/định danh: <code>002077007214_</code>...</li>
+                        <li>Khớp chuẩn tiếng Việt có dấu và không dấu: <code>Nguyễn Tiến Thắng</code> ↔ <code>Nguyen Tien Thang</code></li>
+                        <li>Tự động nhận diện & xử lý hậu tố <code>(2)</code>, <code>(1)</code> khi có trùng tên hoặc file bản sao</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN TABLE & STATS -->
+        <div class="main-content">
+            <!-- STATS CARDS -->
+            <div class="stats-grid">
+                <div class="stat-card stat-total">
+                    <div class="stat-label">Tổng File Excel</div>
+                    <div class="stat-value" id="count-total">0</div>
+                </div>
+                <div class="stat-card stat-matched">
+                    <div class="stat-label">Khớp Thành Công</div>
+                    <div class="stat-value" id="count-matched" style="color: #34d399;">0</div>
+                </div>
+                <div class="stat-card stat-unmatched">
+                    <div class="stat-label">Không Khớp / Lỗi</div>
+                    <div class="stat-value" id="count-unmatched" style="color: #f87171;">0</div>
+                </div>
+                <div class="stat-card stat-conflict">
+                    <div class="stat-label">Tỷ Lệ Thành Công</div>
+                    <div class="stat-value" id="count-rate" style="color: #60a5fa;">0%</div>
+                </div>
+            </div>
+
+            <!-- CONTROLS & FILTER -->
+            <div class="controls-bar">
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" class="search-input" id="search-input" placeholder="Tìm kiếm theo tên file, tên người, thư mục..." oninput="filterTable()">
+                </div>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-filter="all" onclick="setFilter('all')">Tất cả (<span id="btn-count-all">0</span>)</button>
+                    <button class="filter-btn" data-filter="matched" onclick="setFilter('matched')">✅ Đã khớp (<span id="btn-count-matched">0</span>)</button>
+                    <button class="filter-btn" data-filter="unmatched" onclick="setFilter('unmatched')">❌ Chưa khớp (<span id="btn-count-unmatched">0</span>)</button>
+                </div>
+            </div>
+
+            <!-- TABLE CONTAINER -->
+            <div class="table-container">
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 50px;">STT</th>
+                                <th>Tên File Excel Gốc</th>
+                                <th>Họ Tên Nhận Diện</th>
+                                <th>Thư Mục Đích Khớp Được</th>
+                                <th style="width: 140px;">Trạng Thái</th>
+                                <th>Ghi Chú Chi Tiết</th>
+                            </tr>
+                        </thead>
+                        <tbody id="match-tbody">
+                            <tr>
+                                <td colspan="6">
+                                    <div class="empty-placeholder">
+                                        <div class="empty-icon">📂</div>
+                                        <div style="font-size: 15px; font-weight: 600; color: #cbd5e1;">Chưa có dữ liệu</div>
+                                        <div style="font-size: 13px; margin-top: 4px;">Vui lòng chọn Thư mục file Excel (Bước 1) và Thư mục đích (Bước 2) để bắt đầu</div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Global State
+    let sourceDirHandle = null;
+    let targetDirHandle = null;
+    let sourceFiles = []; // Array of FileSystemFileHandle or meta
+    let targetSubFolders = []; // Array of directory names
+    let matchResults = [];
+    let currentFilter = 'all';
+
+    // VIETNAMESE NORMALIZATION
+    function removeVietnameseTones(str) {
+        if (!str) return '';
+        str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, "a");
+        str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, "e");
+        str = str.replace(/ì|í|ị|ỉ|ĩ/g, "i");
+        str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, "o");
+        str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, "u");
+        str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, "y");
+        str = str.replace(/đ/g, "d");
+        str = str.replace(/À|Á|Ạ|Ả|Ã|Â|Ầ|Ấ|Ậ|Ẩ|Ẫ|Ă|Ằ|Ắ|Ặ|Ẳ|Ẵ/g, "a");
+        str = str.replace(/È|É|Ẹ|Ẻ|Ẽ|Ê|Ề|Ế|Ệ|Ể|Ễ/g, "e");
+        str = str.replace(/Ì|Í|Ị|Ỉ|Ĩ/g, "i");
+        str = str.replace(/Ò|Ó|Ọ|Ỏ|Õ|Ô|Ồ|Ố|Ộ|Ổ|Ỗ|Ơ|Ờ|Ớ|Ợ|Ở|Ỡ/g, "o");
+        str = str.replace(/Ù|Ú|Ụ|Ủ|Ũ|Ư|Ừ|Ứ|Ự|Ử|Ữ/g, "u");
+        str = str.replace(/Ỳ|Ý|Ỵ|Ỷ|Ỹ/g, "y");
+        str = str.replace(/Đ/g, "d");
+        // NFD decompose
+        str = str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        return str.toLowerCase().trim();
+    }
+
+    // DETECT & STRIP TRAILING COPY/DUPLICATE NUMBER (2), (1), _2, - 2, 2
+    function stripTrailingIndex(name) {
+        if (!name) return { cleanName: '', suffix: '', rawSuffixNum: '' };
+        // Matches e.g. " (2)", " [2]", " - 2", " _2", or " 2" at the end of name
+        const match = name.match(/^(.*?)(?:\s*[\(\[]\s*(\d+)\s*[\)\]]|\s*[-_]\s*(\d+)|\s+(\d+))$/);
+        if (match) {
+            const base = match[1].trim();
+            const num = match[2] || match[3] || match[4] || '';
+            return {
+                cleanName: base,
+                suffix: num ? `(${num})` : '',
+                rawSuffixNum: num
+            };
+        }
+        return { cleanName: name, suffix: '', rawSuffixNum: '' };
+    }
+
+    // CLEAN FILE NAME
+    function extractPersonNameFromFile(filename) {
+        // Remove extension
+        let name = filename.replace(/\.[^/.]+$/, "");
+        // Remove leading "STT", "No.", "#" if present
+        name = name.replace(/^\s*(?:stt|no\.?|#)?\s*/i, "");
+        // Remove leading numbers with optional sub-indices and separators:
+        // e.g. "174a. ", "174a,", "174-a. ", "174.1. ", "183, ", "1. ", "2.", "19. ", "01 - "
+        name = name.replace(/^\s*\d+(?:[\.\/_\-]\d+|[a-zA-Z]{1,3})?[\.,;:_\-\s]+/, "");
+        // Clean any leftover leading punctuation
+        name = name.replace(/^[\.,;:_\-\s]+/, "");
+        // Collapse spaces
+        return name.replace(/\s+/g, ' ').trim();
+    }
+
+    // CLEAN FOLDER NAME
+    function extractPersonNameFromFolder(foldername) {
+        // Remove ID / CCCD prefix: e.g. "002077007214_Nguyen Tien Thang", "002077007214, Nguyen Tien Thang" -> "Nguyen Tien Thang"
+        let name = foldername.replace(/^\s*[\dA-Za-z]+[_\-\s,;:]+/, "");
+        // Replace remaining underscores, hyphens, commas with spaces
+        name = name.replace(/[_\-,;:]+/g, ' ');
+        return name.replace(/\s+/g, ' ').trim();
+    }
+
+    // Levenshtein similarity
+    function editDistance(s1, s2) {
+        s1 = s1.toLowerCase();
+        s2 = s2.toLowerCase();
+        let costs = [];
+        for (let i = 0; i <= s1.length; i++) {
+            let lastValue = i;
+            for (let j = 0; j <= s2.length; j++) {
+                if (i === 0) costs[j] = j;
+                else {
+                    if (j > 0) {
+                        let newValue = costs[j - 1];
+                        if (s1.charAt(i - 1) !== s2.charAt(j - 1))
+                            newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
+                        costs[j - 1] = lastValue;
+                        lastValue = newValue;
+                    }
+                }
+            }
+            if (i > 0) costs[s2.length] = lastValue;
+        }
+        return costs[s2.length];
+    }
+
+    function calculateSimilarity(s1, s2) {
+        let longer = s1;
+        let shorter = s2;
+        if (s1.length < s2.length) {
+            longer = s2;
+            shorter = s1;
+        }
+        let longerLength = longer.length;
+        if (longerLength === 0) return 1.0;
+        return (longerLength - editDistance(longer, shorter)) / parseFloat(longerLength);
+    }
+
+    // STEP 1: Select Source Folder
+    async function selectSourceFolder() {
+        try {
+            if (!window.showDirectoryPicker) {
+                alert("Trình duyệt của bạn không hỗ trợ trực tiếp File System Access API. Vui lòng mở trang web này bằng Google Chrome hoặc Microsoft Edge.");
+                return;
+            }
+            sourceDirHandle = await window.showDirectoryPicker({ mode: 'read' });
+            sourceFiles = [];
+
+            // Read all files
+            for await (const entry of sourceDirHandle.values()) {
+                if (entry.kind === 'file') {
+                    const ext = entry.name.slice(((entry.name.lastIndexOf(".") - 1) >>> 0) + 2).toLowerCase();
+                    if (['xlsx', 'xls', 'xlsm', 'csv'].includes(ext)) {
+                        sourceFiles.push(entry);
+                    }
+                }
+            }
+
+            // Natural sort files (1., 2., 10., etc.)
+            sourceFiles.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' }));
+
+            document.getElementById('source-status').textContent = `Đã tìm thấy ${sourceFiles.length} file`;
+            document.getElementById('source-status').className = 'step-status ready';
+            document.getElementById('source-info').innerHTML = `📁 <b>${sourceDirHandle.name}</b> (${sourceFiles.length} file Excel)`;
+
+            checkAndRunMatching();
+        } catch (err) {
+            if (err.name !== 'AbortError') {
+                console.error(err);
+                alert("Lỗi khi mở thư mục: " + err.message);
+            }
+        }
+    }
+
+    // STEP 2: Select Target Folder
+    async function selectTargetFolder() {
+        try {
+            if (!window.showDirectoryPicker) {
+                alert("Vui lòng mở trang web này bằng Google Chrome hoặc Microsoft Edge.");
+                return;
+            }
+            targetDirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+            targetSubFolders = [];
+
+            // Read all subdirectories
+            for await (const entry of targetDirHandle.values()) {
+                if (entry.kind === 'directory') {
+                    const rawName = extractPersonNameFromFolder(entry.name);
+                    const { cleanName, suffix, rawSuffixNum } = stripTrailingIndex(rawName);
+
+                    targetSubFolders.push({
+                        name: entry.name,
+                        handle: entry,
+                        rawName: rawName,
+                        cleanName: cleanName,
+                        suffix: suffix,
+                        rawSuffixNum: rawSuffixNum,
+                        normalizedFull: removeVietnameseTones(rawName),
+                        normalizedFullNoSpace: removeVietnameseTones(rawName).replace(/\s+/g, ''),
+                        normalizedClean: removeVietnameseTones(cleanName),
+                        normalizedCleanNoSpace: removeVietnameseTones(cleanName).replace(/\s+/g, '')
+                    });
+                }
+            }
+
+            // Natural sort folders
+            targetSubFolders.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+
+            document.getElementById('target-status').textContent = `Đã tìm thấy ${targetSubFolders.length} thư mục`;
+            document.getElementById('target-status').className = 'step-status ready';
+            document.getElementById('target-info').innerHTML = `🎯 <b>${targetDirHandle.name}</b> (${targetSubFolders.length} thư mục con)`;
+
+            checkAndRunMatching();
+        } catch (err) {
+            if (err.name !== 'AbortError') {
+                console.error(err);
+                alert("Lỗi khi mở thư mục: " + err.message);
+            }
+        }
+    }
+
+    // MATCHING LOGIC
+    function checkAndRunMatching() {
+        if (!sourceDirHandle || !targetDirHandle) return;
+
+        const useFuzzy = document.getElementById('opt-fuzzy-match').checked;
+        matchResults = [];
+
+        sourceFiles.forEach((fileEntry, idx) => {
+            const rawFileName = fileEntry.name;
+            const fullExtractedName = extractPersonNameFromFile(rawFileName);
+            const { cleanName, suffix, rawSuffixNum } = stripTrailingIndex(fullExtractedName);
+
+            const normFull = removeVietnameseTones(fullExtractedName);
+            const normFullNoSpace = normFull.replace(/\s+/g, '');
+            const normClean = removeVietnameseTones(cleanName);
+            const normCleanNoSpace = normClean.replace(/\s+/g, '');
+
+            let matchedFolders = [];
+            let matchType = '';
+
+            // ƯU TIÊN 1: Nếu file có số phụ (vd: (2)), trước tiên kiểm tra xem có thư mục nào CŨNG CÓ số phụ đó không
+            if (suffix) {
+                targetSubFolders.forEach(sub => {
+                    if (sub.normalizedFull === normFull || sub.normalizedFullNoSpace === normFullNoSpace || 
+                        (sub.normalizedClean === normClean && sub.rawSuffixNum === rawSuffixNum)) {
+                        matchedFolders.push({ ...sub, matchPriority: 1 });
+                    }
+                });
+                if (matchedFolders.length > 0) {
+                    matchType = `Chính xác kèm số phân biệt ${suffix}`;
+                }
+            }
+
+            // ƯU TIÊN 2: Nếu không có thư mục nào mang số phụ (2), tự động lược bỏ số phụ để tìm theo tên chuẩn
+            if (matchedFolders.length === 0) {
+                targetSubFolders.forEach(sub => {
+                    if (sub.normalizedClean === normClean || sub.normalizedCleanNoSpace === normCleanNoSpace) {
+                        matchedFolders.push({ ...sub, matchPriority: 2 });
+                    }
+                });
+                if (matchedFolders.length === 1) {
+                    matchType = suffix ? `Tự động bỏ ${suffix} do chỉ có 1 folder` : 'Chính xác';
+                }
+            }
+
+            // ƯU TIÊN 3: Nếu vẫn chưa khớp, thử so khớp mờ (Fuzzy) trên tên chuẩn
+            if (matchedFolders.length === 0 && useFuzzy && normClean.length > 3) {
+                let bestScore = 0;
+                let bestCandidate = null;
+
+                targetSubFolders.forEach(sub => {
+                    const score = calculateSimilarity(normClean, sub.normalizedClean);
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestCandidate = sub;
+                    }
+                });
+
+                if (bestCandidate && bestScore >= 0.88) {
+                    matchedFolders.push({
+                        ...bestCandidate,
+                        matchPriority: 3
+                    });
+                    matchType = suffix 
+                        ? `Gần đúng (${Math.round(bestScore * 100)}%) - tự bỏ ${suffix}` 
+                        : `Gần đúng (${Math.round(bestScore * 100)}%)`;
+                }
+            }
+
+            let status = 'UNMATCHED';
+            let statusText = 'Không tìm thấy';
+            let targetFolderName = '-';
+            let note = 'Không tìm thấy thư mục con phù hợp';
+            let matchedFolderObj = null;
+
+            if (matchedFolders.length === 1) {
+                status = 'MATCHED';
+                statusText = 'Khớp thành công';
+                matchedFolderObj = matchedFolders[0];
+                targetFolderName = matchedFolders[0].name;
+                note = `Khớp [${matchType}] với thư mục "${targetFolderName}"`;
+            } else if (matchedFolders.length > 1) {
+                status = 'CONFLICT';
+                statusText = `Trùng tên (${matchedFolders.length} folder)`;
+                targetFolderName = matchedFolders.map(m => m.name).join('; ');
+                note = `Cảnh báo: Có ${matchedFolders.length} thư mục cùng tên "${cleanName}" (khác CCCD/mã) - vui lòng bấm chọn thư mục mong muốn bên cạnh`;
+            }
+
+            matchResults.push({
+                stt: idx + 1,
+                fileEntry: fileEntry,
+                fileName: rawFileName,
+                fullExtractedName: fullExtractedName,
+                cleanName: cleanName,
+                suffix: suffix,
+                candidateFolders: matchedFolders,
+                matchedFolder: matchedFolderObj,
+                targetFolderName: targetFolderName,
+                status: status,
+                statusText: statusText,
+                note: note,
+                isCopied: false
+            });
+        });
+
+        // Enable buttons
+        document.getElementById('btn-copy').disabled = matchResults.filter(r => r.status === 'MATCHED').length === 0;
+        document.getElementById('btn-export').disabled = matchResults.length === 0;
+
+        updateStats();
+        renderTable();
+    }
+
+    // UPDATE STATS
+    function updateStats() {
+        const total = matchResults.length;
+        const matched = matchResults.filter(r => r.status === 'MATCHED').length;
+        const unmatched = matchResults.filter(r => r.status !== 'MATCHED').length;
+        const rate = total > 0 ? Math.round((matched / total) * 100) : 0;
+
+        document.getElementById('count-total').textContent = total;
+        document.getElementById('count-matched').textContent = matched;
+        document.getElementById('count-unmatched').textContent = unmatched;
+        document.getElementById('count-rate').textContent = rate + '%';
+
+        document.getElementById('btn-count-all').textContent = total;
+        document.getElementById('btn-count-matched').textContent = matched;
+        document.getElementById('btn-count-unmatched').textContent = unmatched;
+    }
+
+    // HELPER: RENDER FOLDER OPTIONS
+    function renderFolderOptions(selectedName) {
+        return targetSubFolders.map(f => {
+            const isSel = f.name === selectedName ? 'selected' : '';
+            return `<option value="${escapeHtml(f.name)}" ${isSel}>${escapeHtml(f.name)}</option>`;
+        }).join('');
+    }
+
+    // USER MANUAL ASSIGNMENT EVENT
+    function onManualSelectFolder(stt, selectedFolderName) {
+        const item = matchResults.find(r => r.stt === stt);
+        if (!item) return;
+
+        if (!selectedFolderName) {
+            checkAndRunMatching();
+            return;
+        }
+
+        const folderObj = targetSubFolders.find(f => f.name === selectedFolderName);
+        if (folderObj) {
+            item.matchedFolder = folderObj;
+            item.targetFolderName = folderObj.name;
+            item.status = 'MATCHED';
+            item.statusText = 'Đã gán thủ công';
+            item.note = `✅ Đã chọn thủ công vào thư mục "${folderObj.name}"`;
+            
+            document.getElementById('btn-copy').disabled = matchResults.filter(r => r.status === 'MATCHED').length === 0;
+            document.getElementById('btn-export').disabled = matchResults.length === 0;
+
+            updateStats();
+            renderTable();
+        }
+    }
+
+    // RENDER TABLE
+    function renderTable() {
+        const tbody = document.getElementById('match-tbody');
+        const searchTerm = document.getElementById('search-input').value.toLowerCase().trim();
+
+        const filtered = matchResults.filter(item => {
+            // Filter by tab
+            if (currentFilter === 'matched' && item.status !== 'MATCHED') return false;
+            if (currentFilter === 'unmatched' && item.status === 'MATCHED') return false;
+
+            // Filter by search term
+            if (searchTerm) {
+                const combined = `${item.fileName} ${item.cleanName} ${item.suffix} ${item.targetFolderName} ${item.note}`.toLowerCase();
+                return combined.includes(searchTerm);
+            }
+            return true;
+        });
+
+        if (filtered.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6">
+                        <div class="empty-placeholder">
+                            <div class="empty-icon">🔍</div>
+                            <div style="font-size: 14px; font-weight: 600;">Không có dữ liệu phù hợp với bộ lọc</div>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        let html = '';
+        filtered.forEach((item, index) => {
+            let badgeClass = 'badge-unmatched';
+            let icon = '❌';
+
+            if (item.isCopied) {
+                badgeClass = 'badge-copied';
+                icon = '📦';
+            } else if (item.status === 'MATCHED') {
+                badgeClass = 'badge-matched';
+                icon = '✅';
+            } else if (item.status === 'CONFLICT') {
+                badgeClass = 'badge-conflict';
+                icon = '⚠️';
+            }
+
+            // Name display with suffix badge if (2), (1)...
+            let nameDisplay = `<span style="font-weight: 600; color: #f8fafc;">${escapeHtml(item.cleanName)}</span>`;
+            if (item.suffix) {
+                nameDisplay += ` <span style="background: rgba(245, 158, 11, 0.18); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); padding: 1px 6px; border-radius: 4px; font-size: 11px; font-weight: 700;">Hậu tố: ${escapeHtml(item.suffix)}</span>`;
+            }
+
+            // Folder column display (with interactive dropdown when conflicted or manual change)
+            let folderDisplay = '';
+            if (item.status === 'MATCHED') {
+                folderDisplay = `
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                        <span class="code-cell" style="color: #a7f3d0; font-weight: 600;">${escapeHtml(item.targetFolderName)}</span>
+                        <select class="folder-select-mini" title="Đổi thư mục đích khác nếu muốn" onchange="onManualSelectFolder(${item.stt}, this.value)">
+                            <option value="">⚙️ Đổi folder...</option>
+                            ${renderFolderOptions(item.matchedFolder ? item.matchedFolder.name : '')}
+                        </select>
+                    </div>
+                `;
+            } else if (item.status === 'CONFLICT') {
+                folderDisplay = `
+                    <div style="display: flex; flex-direction: column; gap: 5px;">
+                        <span style="font-size: 11px; color: #fbbf24; font-weight: 600;">⚠️ Trùng tên! Chọn 1 trong ${item.candidateFolders.length} thư mục bên dưới:</span>
+                        <select class="folder-select conflict-select" onchange="onManualSelectFolder(${item.stt}, this.value)">
+                            <option value="">-- Bấm vào đây để chọn thư mục đích --</option>
+                            <optgroup label="Thư mục trùng tên (${item.candidateFolders.length} CCCD khác nhau)">
+                                ${item.candidateFolders.map(f => `<option value="${escapeHtml(f.name)}">${escapeHtml(f.name)}</option>`).join('')}
+                            </optgroup>
+                            <optgroup label="Tất cả các thư mục khác">
+                                ${renderFolderOptions('')}
+                            </optgroup>
+                        </select>
+                    </div>
+                `;
+            } else {
+                folderDisplay = `
+                    <select class="folder-select" onchange="onManualSelectFolder(${item.stt}, this.value)">
+                        <option value="">-- Chọn thư mục đích thủ công --</option>
+                        ${renderFolderOptions('')}
+                    </select>
+                `;
+            }
+
+            html += `
+                <tr>
+                    <td style="color: var(--text-muted); font-weight: 600;">${item.stt}</td>
+                    <td class="code-cell" style="color: #60a5fa; font-weight: 500;">${escapeHtml(item.fileName)}</td>
+                    <td>${nameDisplay}</td>
+                    <td>${folderDisplay}</td>
+                    <td>
+                        <span class="badge-status ${badgeClass}">
+                            ${icon} ${item.isCopied ? 'Đã Chép' : item.statusText}
+                        </span>
+                    </td>
+                    <td style="color: ${item.status === 'MATCHED' ? '#94a3b8' : '#fca5a5'}; font-size: 12px;">
+                        ${escapeHtml(item.note)}
+                    </td>
+                </tr>
+            `;
+        });
+
+        tbody.innerHTML = html;
+    }
+
+    function setFilter(filterType) {
+        currentFilter = filterType;
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.getAttribute('data-filter') === filterType);
+        });
+        renderTable();
+    }
+
+    function filterTable() {
+        renderTable();
+    }
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        return String(text).replace(/[&<>"']/g, function(m) {
+            return {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            }[m];
+        });
+    }
+
+    // LOGGING HELPER
+    function logMsg(msg) {
+        const logBox = document.getElementById('log-box');
+        const p = document.createElement('div');
+        p.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+        logBox.appendChild(p);
+        logBox.scrollTop = logBox.scrollHeight;
+    }
+
+    // STEP 3: EXECUTE COPY FILE OPERATION
+    async function executeFileOperation() {
+        const matchedItems = matchResults.filter(r => r.status === 'MATCHED');
+        if (matchedItems.length === 0) {
+            alert("Không có file nào đã khớp để sao chép!");
+            return;
+        }
+
+        const confirmMsg = `Bạn có chắc chắn muốn SAO CHÉP ${matchedItems.length} file Excel vào các thư mục con tương ứng không?`;
+        if (!confirm(confirmMsg)) return;
+
+        const progressBox = document.getElementById('progress-box');
+        const progressBar = document.getElementById('progress-bar');
+        const progressPct = document.getElementById('progress-pct');
+        const progressText = document.getElementById('progress-text');
+        const logBox = document.getElementById('log-box');
+
+        progressBox.style.display = 'block';
+        logBox.innerHTML = '';
+        document.getElementById('btn-copy').disabled = true;
+
+        let successCount = 0;
+        let failCount = 0;
+
+        for (let i = 0; i < matchedItems.length; i++) {
+            const item = matchedItems[i];
+            const pct = Math.round(((i + 1) / matchedItems.length) * 100);
+            progressBar.style.width = pct + '%';
+            progressPct.textContent = pct + '%';
+            progressText.textContent = `Đang sao chép (${i + 1}/${matchedItems.length}): ${item.fileName}`;
+
+            try {
+                // Get source file data
+                const sourceFile = await item.fileEntry.getFile();
+                const buffer = await sourceFile.arrayBuffer();
+
+                // Get target subfolder handle
+                const subDirHandle = item.matchedFolder.handle;
+
+                const keepOrigName = document.getElementById('opt-keep-original-name').checked;
+                let destFileName = item.fileName;
+                if (!keepOrigName) {
+                    const ext = item.fileName.slice(((item.fileName.lastIndexOf(".") - 1) >>> 0) + 2);
+                    // Giữ lại hậu tố (2) nếu có để tránh đè file nếu một người có 2 file
+                    if (item.suffix) {
+                        destFileName = `${item.cleanName} ${item.suffix}.${ext}`;
+                    } else {
+                        destFileName = `${item.cleanName}.${ext}`;
+                    }
+                }
+
+                // Write file to target subfolder
+                const targetFileHandle = await subDirHandle.getFileHandle(destFileName, { create: true });
+                const writable = await targetFileHandle.createWritable();
+                await writable.write(buffer);
+                await writable.close();
+
+                item.isCopied = true;
+                item.note = `✅ Đã sao chép thành công vào [${item.targetFolderName}] (tên file: ${destFileName})`;
+                successCount++;
+                logMsg(`Sao chép thành công: ${item.fileName} -> ${item.targetFolderName}/${destFileName}`);
+            } catch (err) {
+                console.error(err);
+                item.note = `❌ Lỗi chép file: ${err.message}`;
+                failCount++;
+                logMsg(`Lỗi khi chép ${item.fileName}: ${err.message}`);
+            }
+
+            // Yield control to UI thread
+            if (i % 3 === 0) await new Promise(r => setTimeout(r, 20));
+        }
+
+        progressText.textContent = `Hoàn tất! Thành công: ${successCount}, Lỗi: ${failCount}`;
+        renderTable();
+        document.getElementById('btn-copy').disabled = false;
+        alert(`🎉 Quá trình sao chép hoàn tất!\n- Thành công: ${successCount} file\n- Lỗi: ${failCount} file\n\nBạn có thể bấm "Xuất File Báo Cáo Excel" để lưu lại kết quả chi tiết.`);
+    }
+
+    // STEP 4: EXPORT EXCEL REPORT (.xlsx)
+    function exportExcelReport() {
+        if (matchResults.length === 0) {
+            alert("Chưa có dữ liệu để xuất báo cáo!");
+            return;
+        }
+
+        if (typeof XLSX === 'undefined') {
+            alert("Lỗi: Thư viện SheetJS chưa sẵn sàng. Vui lòng tải lại trang.");
+            return;
+        }
+
+        // Prepare data for Excel
+        const exportData = matchResults.map(item => {
+            return {
+                "STT": item.stt,
+                "Tên File Excel Gốc": item.fileName,
+                "Họ Tên Trích Xuất": item.cleanName,
+                "Hậu Tố File": item.suffix || "Không có",
+                "Thư Mục Đích Khớp Được": item.targetFolderName,
+                "Trạng Thái Khớp": item.isCopied ? "Đã sao chép thành công" : item.statusText,
+                "Ghi Chú Chi Tiết": item.note,
+                "Thời Gian Xử Lý": new Date().toLocaleString('vi-VN')
+            };
+        });
+
+        // Create worksheet
+        const ws = XLSX.utils.json_to_sheet(exportData);
+
+        // Auto column widths
+        const colWidths = [
+            { wch: 6 },  // STT
+            { wch: 34 }, // Tên File Excel Gốc
+            { wch: 25 }, // Họ Tên Trích Xuất
+            { wch: 14 }, // Hậu Tố File
+            { wch: 38 }, // Thư Mục Đích Khớp Được
+            { wch: 24 }, // Trạng Thái Khớp
+            { wch: 60 }, // Ghi Chú Chi Tiết
+            { wch: 22 }  // Thời Gian Xử Lý
+        ];
+        ws['!cols'] = colWidths;
+
+        // Create workbook
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Báo Cáo Matching");
+
+        // Generate file name
+        const now = new Date();
+        const dateStr = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}`;
+        const exportFileName = `Bao_Cao_Matching_Excel_${dateStr}.xlsx`;
+
+        // Download
+        XLSX.writeFile(wb, exportFileName);
+    }
+</script>
+
+</body>
+</html>

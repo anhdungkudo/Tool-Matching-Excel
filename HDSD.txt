@@ -1,0 +1,24 @@
+========================================================================
+   HƯỚNG DẪN SỬ DỤNG TOOL MATCHING FILE EXCEL (HTML + JS THUẦN)
+========================================================================
+
+Tool chạy hoàn toàn bằng HTML + JavaScript (không cần Python, không cần cài đặt).
+Chỉ cần mở bằng trình duyệt Google Chrome hoặc Microsoft Edge.
+
+CÁCH SỬ DỤNG:
+------------------------------------------------------------------------
+1. Nhấp đúp chuột mở file:  index.html
+
+2. BƯỚC 1: Bấm nút "📂 Chọn Thư Mục Chứa File Excel"
+   - Chọn thư mục chứa các file Excel của bạn (vd: 1. Nguyễn Tiến Thắng.xlsx,...)
+
+3. BƯỚC 2: Bấm nút "🎯 Chọn Thư Mục Đích"
+   - Chọn thư mục lớn chứa các thư mục con (vd: 002077007214_Nguyen Tien Thang,...)
+   - Khi trình duyệt hỏi xin quyền xem/sửa file, bạn bấm "Cho phép" (Allow).
+
+4. BƯỚC 3:
+   - Tool tự động nhận diện tiếng Việt có dấu/không dấu, bỏ số thứ tự & mã CCCD.
+   - Bảng xem trước sẽ hiện danh sách: Xanh = Khớp, Đỏ = Chưa khớp / Lỗi.
+   - Bấm nút "🚀 Chép File Vào Thư Mục Đích" để sao chép file.
+   - Bấm nút "📑 Xuất File Báo Cáo Excel (.xlsx)" để tải file báo cáo thống kê.
+========================================================================
